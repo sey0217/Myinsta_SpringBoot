@@ -1,6 +1,5 @@
 package com.posco.insta.config;
 
-import com.posco.insta.user.model.UserDto;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -53,7 +52,7 @@ public class SecurityService {
         return claims.getSubject();
     }
 
-    public Integer getIdAtToken(){
+    public int getIdAtToken(){
         //헤더에서 빼오는 거
         ServletRequestAttributes requestAttributes =
                 (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();

@@ -55,7 +55,7 @@ public class UserController {
 
     @PutMapping("/{id}")
     @TokenRequired
-    @Operation(description = "정보 업데이트")
+    @Operation(description = "")
     public Integer updateUserById(
             @RequestBody UserDto userDto){
 

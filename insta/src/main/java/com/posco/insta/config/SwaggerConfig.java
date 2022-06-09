@@ -21,6 +21,7 @@ public class SwaggerConfig {
                 .paths(PathSelectors.any())
                 .build()
                 .apiInfo(apiInfo());
+
     }
     private ApiInfo apiInfo(){
         return new ApiInfoBuilder().title("Insta").description("Insta api docs").version("1.0").build();
