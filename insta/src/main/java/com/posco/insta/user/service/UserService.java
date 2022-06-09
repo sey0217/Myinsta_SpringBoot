@@ -12,7 +12,7 @@ public interface UserService {
 
     Integer postUser(UserDto userDto);
 
-    Integer deleteUser(UserDto userDto);
+    Integer deleteUserById(UserDto userDto);
 
     Integer updateUserById(Integer id);
 

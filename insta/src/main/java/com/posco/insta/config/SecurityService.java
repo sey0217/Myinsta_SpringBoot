@@ -1,19 +1,32 @@
 package com.posco.insta.config;
 
+import com.posco.insta.user.model.UserDto;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.crypto.spec.SecretKeySpec;
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.DatatypeConverter;
 import java.security.Key;
 import java.util.Date;
 
 @Service
+@Slf4j
 public class SecurityService {
-    private static final String SECRET_KEY = "dlkfjlskdjflasdfasdfasdfasdfasdfasdfasdfjsdlkfj";
-    public String createToken(String subject, long expTime){
+    @Value("${jwt.secret_key}")
+    String SECRET_KEY;
+    @Value("${jwt.expTime}")
+    long expTime;
+    public String createToken(String subject){
+        log.info(SECRET_KEY);
+        log.info(""+expTime);
+
         if(expTime <= 0){
             throw new RuntimeException();
         }
@@ -30,13 +43,26 @@ public class SecurityService {
                 .compact();
     }
 
-    public String getSubject(String token){
+    public String getSubject(String tokenBearer){
+        String token = tokenBearer.substring("Bearer ".length());
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(DatatypeConverter.parseBase64Binary(SECRET_KEY))
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
         return claims.getSubject();
+    }
+
+    public Integer getIdAtToken(){
+        //헤더에서 빼오는 거
+        ServletRequestAttributes requestAttributes =
+                (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+        HttpServletRequest request = requestAttributes.getRequest();
+        String tokenBearer = request.getHeader("Authorization");
+        //토큰에서 id 값 빼오기
+        String id = getSubject(tokenBearer);
+        return Integer.parseInt(id);
+
     }
 
 

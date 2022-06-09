@@ -4,8 +4,11 @@ import com.posco.insta.aspect.TokenRequired;
 import com.posco.insta.config.SecurityService;
 import com.posco.insta.user.model.UserDto;
 import com.posco.insta.user.service.UserServiceImpl;
+import io.swagger.v3.oas.annotations.Operation;
 import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -36,26 +39,34 @@ public class UserController {
         return  userService.findUserById(userDto);
     }
     @PostMapping("/")
-    public Integer postUser(@RequestBody UserDto userDto)
+    public ResponseEntity<?> postUser(@RequestBody UserDto userDto)
     {
-        return userService.postUser(userDto);
+        HttpStatus httpStatus = userService.postUser(userDto)==1?HttpStatus.CREATED: HttpStatus.BAD_REQUEST;
+        return new ResponseEntity<>(httpStatus);
     }
 
     @DeleteMapping("/{id}")
-    public Integer deleteUser(UserDto userDto){
-        return userService.deleteUser(userDto);
+    @TokenRequired
+    public Integer deleteUserById(UserDto userDto){
+//        UserDto userDto = new UserDto();
+        userDto.setId(securityService.getIdAtToken());
+        return userService.deleteUserById(userDto);
     }
+
     @PutMapping("/{id}")
+    @TokenRequired
+    @Operation(description = "정보 업데이트")
     public Integer updateUserById(
-            @RequestBody UserDto userDto,
-            @PathVariable String id){
-        return userService.updateUserById(Integer.valueOf(id));
+            @RequestBody UserDto userDto){
+
+        return userService.updateUserById(securityService.getIdAtToken());
     }
     @PostMapping("/login")
+    @Operation(description = "로그인")
     public Map loginUser(@RequestBody UserDto userDto){
         UserDto loginUser = userService.serviceLogin(userDto);
         //System.out.println(loginUser.toString());
-        String token = securityService.createToken(loginUser.getId().toString(),60*60*1000);
+        String token = securityService.createToken(loginUser.getId().toString());
         Map<String,Object> map = new HashMap<>();
         map.put("token",token);
         map.put("name",loginUser.getName());
@@ -79,16 +90,22 @@ public class UserController {
                 (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
         HttpServletRequest request = requestAttributes.getRequest();
 
-        String token = request.getHeader("token");
-        String subject = securityService.getSubject(token);
+        String tokenBearer = request.getHeader("Authorization");
+        String subject = securityService.getSubject(tokenBearer);
         return subject;
     }
 
-//    @GetMapping("/me")
-//    @TokenRequired
-//    public UserDto getUserByMe(){
-//        UserDto userDto = new UserDto();
-//        userDto.setId(Integer.valueOf());
-//        return  userService.findUserById(userDto);
-//    }
+    @GetMapping("/me")
+    @TokenRequired
+    public UserDto getUserByMe(){
+        //실행 로직
+        UserDto userDto = new UserDto();
+        userDto.setId(securityService.getIdAtToken());
+        return  userService.findUserById(userDto);
+    }
+    @TokenRequired
+    @GetMapping("/check")
+    public Boolean check(){
+        return true;
+    }
 }
