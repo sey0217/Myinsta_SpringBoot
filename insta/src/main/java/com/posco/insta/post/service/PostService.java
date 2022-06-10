@@ -13,4 +13,18 @@ public interface PostService {
     List<SelectPostJoinUserDto> getPostByUserId(PostDto postDto);
 
     Integer deletePostByUserIdAndId(PostDto PostDto);
+
+    List<SelectPostJoinUserDto> findPostsByNotUserId(PostDto postDto);
+
+    Integer updateMyPost(PostDto postDto);
+
+    Integer insertPost(PostDto postDto);
+
+    SelectPostJoinUserDto getPostsById(PostDto postDto);
+    List<SelectPostJoinUserDto> finePostsLikeKey(String word);
+
+
+    List<SelectPostJoinUserDto> findPostsByFollowing(PostDto postDto);
+
+
 }

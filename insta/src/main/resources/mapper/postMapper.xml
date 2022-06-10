@@ -8,6 +8,17 @@
             FROM
                 users
     </select>
+    <select id="getPostsById" resultType="SelectPostJoinUserDto" parameterType="PostDto">
+        SELECT
+            p.id, p.userId, p.img, p.content
+            u.name as userName, u.img as userImg
+        FROM
+            posts as p
+        INNER JOIN user as u
+        ON u.id = p.userId
+        WHERE
+            id = #{id}
+    </select>
     <select id="findPostsByUserId" resultType="SelectPostJoinUserDto" parameterType="PostDto">
         SELECT
             p.id, p.userId, p.img, p.content,
@@ -24,5 +35,56 @@
         DELETE FROM posts
         WHERE id=#{id} and userId = #{userId}
     </delete>
+    <select id="findPostsByNotUserId" resultType="SelectPostJoinUserDto" parameterType="PostDto">
+        SELECT
+        p.id, p.userId, p.img, p.content,
+        u.name as userName, u.img as userImg
+        FROM
+        posts as p
+        INNER JOIN
+        users as u
+        ON p.userId = u.id
+        WHERE
+        p.userId != #{userId}
+    </select>
+    <update id="updatePostByUserIdAndId" parameterType="PostDto">
+        UPDATE posts
+        <set>
+            <if test="img!=null"> img = #{img},</if>
+            <if test="content!=null"> content = #{content},</if>
+        </set>
+        WHERE id = #{id} AND userId = #{userId}
+    </update>
+    <insert id="insertPost" parameterType="PostDto">
+        INSERT INTO posts (userId, content, img)
+        VALUES (#{userId}, #{content}, #{img})
+    </insert>
+    <select id="finePostsLikeKey" resultType="SelectPostJoinUserDto" parameterType="String">
+        SELECT
+            p.id, p.userId, p.img, p.content,
+            u.name as userName, u.img as userImg
+        FROM
+            posts as p
+        INNER JOIN
+            users as u
+        ON p.userId = u.id
+        WHERE p.content LIKE concat('%',#{word},'%')
+<!--        WHERE p.content LIKE ('%${word}%')-->
+
+    </select>
+    <select id="findPostsByFollowing" resultType="SelectPostJoinUserDto" parameterType="PostDto">
+        SELECT
+            p.id, p.userId, p.img, p.content,
+            u.name as userName, u.img as userImg
+        FROM
+            posts as p
+        INNER JOIN
+            users as u ON p.userId = u.id
+        INNER JOIN
+                follows as f ON f.follower = p.userId
+        WHERE f.following = #{userId}
+
+    </select>
+
 
 </mapper>

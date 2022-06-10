@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PostDto {
     private Integer id;
-    private Integer userId;
+    private Integer userId; //토큰에 있는 id
     private String img;
     private String content;
 
