@@ -6,16 +6,16 @@
        SELECT
             follower, following
        FROM
-            follow
+            follows
        WHERE follower = #{follower}
 
    </select>
     <select id="getFollower" resultType="FollowDto" parameterType="FollowDto">
         SELECT
-
+            follower, following
         FROM
-            follow
-        WHERE follower = #{follower}
+            follows
+        WHERE following = #{following}
 
     </select>
     <insert id="insertFollow" parameterType="FollowDto">

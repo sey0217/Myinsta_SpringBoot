@@ -43,6 +43,7 @@ public class SecurityService {
     }
 
     public String getSubject(String tokenBearer){
+
         String token = tokenBearer.substring("Bearer ".length());
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(DatatypeConverter.parseBase64Binary(SECRET_KEY))
